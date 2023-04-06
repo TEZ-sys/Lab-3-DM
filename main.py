@@ -1,40 +1,58 @@
-from sys import maxsize
-from itertools import permutations
+import numpy as np
 
 
-def travellingSalesmanProblem(graph, s):
-    vertex = []
-    for i in range(V):
-        if i != s:
-            vertex.append(i)
+def load_matrix(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        n = int(lines[0])
+        matrix = np.zeros((n, n), dtype=int)
 
-    min_path = maxsize
-    next_permutation = permutations(vertex)
-    for i in next_permutation:
-        current_pathweight = 0
-        k = s
-        path = [s]
-        for j in i:
-            current_pathweight += graph[k][j]
-            k = j
-            path.append(j)
-        current_pathweight += graph[k][s]
-        path.append(s)
-        if current_pathweight < min_path:
-            min_path = current_pathweight
-            min_path_vertex = path
-    
-    return min_path_vertex
+        for i in range(n):
+            row = lines[i + 1].split()
+            for j in range(n):
+                matrix[i][j] = int(row[j])
 
-if __name__ == "__main__":
-    with open("input.txt", "r") as file:
-        contents = file.read()
-        string_values = contents.split()
-        int_values = [int(x) for x in string_values]
-        V = int_values[0]
-        int_values.remove(V)
-        sublist_len = len(int_values) // V
-        graph = [int_values[i:i + sublist_len] for i in range(0, len(int_values), sublist_len)]
+        return matrix, n
 
-        s = 1
-        print(travellingSalesmanProblem(graph, s))
+
+
+def calculate_route_cost(route, matrix):
+    cost = 0
+    for i in range(len(route) - 1):
+        if matrix[route[i]][route[i + 1]] == 0:
+            return None
+        cost += matrix[route[i]][route[i + 1]]
+    return cost
+
+
+
+def tsp(matrix):
+    n = len(matrix)
+    best_route = None
+    best_cost = float('inf')
+
+    def backtrack(curr_route, curr_cost):
+        nonlocal best_route, best_cost
+        if len(curr_route) == n:
+            cost = calculate_route_cost(curr_route, matrix)
+            if cost is not None and cost < best_cost:
+                best_route = curr_route
+                best_cost = cost
+        else:
+            for i in range(n):
+                if i not in curr_route:
+                    backtrack(curr_route + [i], curr_cost + matrix[curr_route[-1]][i])
+
+    backtrack([0], 0)
+    return best_route, best_cost
+
+
+matrix, n = load_matrix('input.txt')
+
+best_route, best_cost = tsp(matrix)
+
+if best_route is None:
+    print("Неможливо знайти маршрут, що відвідає всі вершини")
+else:
+    print("Оптимальний маршрут:", best_route)
+    print("Вага оптимального маршруту:", best_cost)
