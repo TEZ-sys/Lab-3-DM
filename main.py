@@ -23,8 +23,8 @@ def travellingSalesmanProblem(graph, s):
         if current_pathweight < min_path:
             min_path = current_pathweight
             min_path_vertex = path
-    total = min_path_vertex,min_path
-    return total
+    
+    return min_path_vertex
 
 if __name__ == "__main__":
     with open("input.txt", "r") as file:
