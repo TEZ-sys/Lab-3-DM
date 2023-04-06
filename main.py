@@ -36,5 +36,5 @@ if __name__ == "__main__":
         sublist_len = len(int_values) // V
         graph = [int_values[i:i + sublist_len] for i in range(0, len(int_values), sublist_len)]
 
-        s = 0
+        s = 1
         print(travellingSalesmanProblem(graph, s))
